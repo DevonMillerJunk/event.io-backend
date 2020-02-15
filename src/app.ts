@@ -72,7 +72,7 @@ class App {
     });
     this.app.use(
       (error: Error, req: Request, res: Response, next: () => void) => {
-        this.logger.error(error);
+        //this.logger.error(error);
         res.status(400).send({
           error,
           info: error.message,
@@ -84,7 +84,6 @@ class App {
     );
   }
   public startServer(port: string) {
-    console.log(`Server started on port ${port}`);
     this.app.listen(port, () => {
       this.logger.info(`Server started on port ${port}`);
     });

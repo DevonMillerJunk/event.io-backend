@@ -7,6 +7,8 @@ class user {
     next: (error?: any) => void
   ) => {
     try {
+      //const result =
+      res.send("Hello");
     } catch (error) {
       next(error);
     }

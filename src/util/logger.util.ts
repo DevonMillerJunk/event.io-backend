@@ -8,7 +8,7 @@ class Logger {
   private isTesting = process.env.NODE_ENV === "test";
   private namespace: string;
   constructor(namespace: string) {
-    this.namespace = `event.io:${namespace}:`;
+    this.namespace = `event-io:${namespace}:`;
     this.bunyanLogger = bunyan.createLogger({
       name: this.namespace,
       streams: [

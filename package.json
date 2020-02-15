@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "NODE_ENV=development nodemon ./build/index.js",
+    "dev": "DEBUG=event-io:* NODE_ENV=development nodemon ./build/index.js",
     "start": "NODE_ENV=production node ./build/index.js"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "nodemon": "^1.18.10",
     "pg": "^7.18.1",
     "tslint": "^6.0.0",
     "typescript": "^3.7.5"
