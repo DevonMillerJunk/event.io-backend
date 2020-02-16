@@ -3,6 +3,7 @@ import { getEvents, insertEvent, getEvent, updateEvent, deleteEvent, registerFor
 import { IEventInterface } from "../database/models/Event";
 import jwt = require("jsonwebtoken");
 import config = require('config');
+import Radar from "../util/radar.util";
 
 class events {
   public getEvents = async (
@@ -40,12 +41,17 @@ class events {
       const eventInt: IEventInterface = {
         title: req.body.title,
         description: req.body.description,
-        ownerId: req.body.ownerId
+        ownerId: req.body.ownerId,
+        location: {
+          lat: req.body.lat,
+          long: req.body.long
+        }
       };
       const result = await insertEvent(eventInt);
       if (!result) {
         return res.status(400).json({ msg: "Error: can't create event" });
       }
+      await Radar.createGeofence(result._id, req.body.description, req.body.long, req.body.lat);
       jwt.sign(
         result,
         config.get('jwtSecret'),
@@ -72,8 +78,9 @@ class events {
       if (!result) {
         return res.status(400).json({ msg: "Error: can't get event" });
       }
+      const users = await Radar.getUsersInGeofence(result._id);
       jwt.sign(
-        result,
+        { ...result, inGeofence: users },
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -97,12 +104,17 @@ class events {
       const eventInt: IEventInterface = {
         title: req.body.title,
         description: req.body.description,
-        ownerId: req.body.ownerId
+        ownerId: req.body.ownerId,
+        location: {
+          lat: req.body.lat,
+          long: req.body.long
+        }
       };
       const result = await updateEvent(req.body.id, eventInt);
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't update event" });
       }
+      await Radar.updateGeofence(req.body.id, eventInt.description, eventInt.location ? eventInt.location.long : 0, eventInt.location ? eventInt.location.lat : 0)
       jwt.sign(
         result,
         config.get('jwtSecret'),
@@ -129,6 +141,7 @@ class events {
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't delete event" });
       }
+      await Radar.deleteGeofence(req.body.id);
       jwt.sign(
         { msg: result },
         config.get('jwtSecret'),
