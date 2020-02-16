@@ -4,8 +4,8 @@ export interface IUserInterface {
     name: string;
     email: string;
     password: string;
-    eventsCreated: string[];
-    registeredEvents: string[];
+    eventsCreated?: string[];
+    registeredEvents?: string[];
 }
 
 export interface IUser extends mongoose.Document {
