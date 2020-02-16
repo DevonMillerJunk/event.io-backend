@@ -2,8 +2,8 @@ import mongoose = require("mongoose");
 
 export interface attendee {
     userId: string,
-    timeIn: string,
-    timeOut: string
+    timeIn?: string,
+    timeOut?: string
 }
 
 export interface IEventInterface {

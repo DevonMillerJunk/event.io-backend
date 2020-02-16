@@ -50,9 +50,6 @@ class App {
         post: user.createUser,
         put: user.updateUser,
         delete: user.deleteUser,
-        "/registered": {
-          get: user.getRegisteredEvents
-        },
         "/hosted": {
           get: user.getEvents
         }
@@ -73,7 +70,7 @@ class App {
     });
     this.app.use(
       (error: Error, req: Request, res: Response, next: () => void) => {
-        //this.logger.error(error);
+        this.logger.error(error);
         res.status(400).send({
           error,
           info: error.message,
