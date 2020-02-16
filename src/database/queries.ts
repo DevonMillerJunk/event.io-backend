@@ -14,11 +14,11 @@ export const getUser = async (email: string, password: string) => {
         return user;
     });
     if (!user) {
-        return "Error: No user with that email";
+        return { msg: "Error: No user with that email" };
     } else {
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
-            return "Error: No user with that email";
+            return { msg: "Error: No user with that email" };
         }
     }
     return user;
@@ -35,29 +35,49 @@ export const deleteUser = async (email: string) => {
 }
 
 export const updateUser = async (id: string, body: IUserInterface) => {
-    const encryptedPassword = await hashEncrypt(body.password);
-    return await User.findByIdAndUpdate(id, { ...body, "password": encryptedPassword }, (err: any) => {
+    const user = await User.findById(id, (err: any, user: any) => {
         if (err) {
             logger.error(err);
-            return false;
+            return null;
         }
-        return true;
+        return user;
+    });
+    if (!user) {
+        return { msg: "Error: No user with that id" };
+    }
+    const encryptedPassword = await hashEncrypt(body.password);
+    return await User.findByIdAndUpdate(id, { ...user, ...body, password: encryptedPassword }, (err: any) => {
+        if (err) {
+            logger.error(err);
+            return "Failure";
+        }
+        return "Success";
     });
 }
 
 export const insertUser = async (body: IUserInterface) => {
-    const replicate = await User.findOne({ "email": body.email });
+    const replicate = await User.findOne({ email: body.email });
     if (replicate) {
         return "Error: Email already in use";
     }
     const encryptedPassword = await hashEncrypt(body.password);
-    const newUser = new User({ ...body, "password": encryptedPassword });
+    const newUser = new User({ ...body, password: encryptedPassword });
     return await newUser.save();
 }
 
 //Events
-export const getEvents = async (ownerId: string) => {
+export const getEventsFromUser = async (ownerId: string) => {
     return await Event.find({ ownerId }, (err: any, event: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return event;
+    });
+}
+
+export const getEvents = async () => {
+    return await Event.find((err: any, event: any) => {
         if (err) {
             logger.error(err);
             return null;
@@ -87,7 +107,17 @@ export const deleteEvent = async (id: string) => {
 }
 
 export const updateEvent = async (id: string, body: IEventInterface) => {
-    return await Event.findByIdAndUpdate(id, body, (err: any) => {
+    const event = await Event.findById(id, (err: any, event: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return event;
+    });
+    if (!event) {
+        return { msg: "Error: No event with that id" };
+    }
+    return await Event.findByIdAndUpdate(id, { ...event, ...body }, (err: any) => {
         if (err) {
             logger.error(err);
             return false;
@@ -99,4 +129,94 @@ export const updateEvent = async (id: string, body: IEventInterface) => {
 export const insertEvent = async (body: IEventInterface) => {
     const newEvent = new Event(body);
     return await newEvent.save();
+}
+
+export const registerForEvent = async (eventId: string, userId: string) => {
+    const event = await Event.findById(eventId, (err: any, event: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return event;
+    });
+    if (!event) {
+        return { msg: "Error: No event with that id" };
+    }
+    const user = await User.findById(userId, (err: any, user: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return user;
+    });
+    if (!user) {
+        return { msg: "Error: No user with that id" };
+    }
+    if (user.registeredEvents.filter(e => e === eventId).length >= 1) {
+        return { msg: "Error: User already signed up for event" };
+    }
+    const updateUser = await User.findByIdAndUpdate(userId, { ...user, registerForEvent: [...user.registeredEvents, eventId] }, (err: any) => {
+        if (err) {
+            logger.error(err);
+            return false;
+        }
+        return true;
+    });
+    if (!updateUser) {
+        return { msg: "Error: Can't update user" };
+    }
+    const attendee: attendee = {
+        userId
+    }
+    return await Event.findByIdAndUpdate(eventId, { ...event, attendees: [...event.attendees, attendee] }, (err: any) => {
+        if (err) {
+            logger.error(err);
+            return { msg: "Error: Can't update event" };
+        }
+        return { msg: "Success: registered for event" };
+    });
+}
+
+
+export const removeRegistration = async (eventId: string, userId: string) => {
+    const event = await Event.findById(eventId, (err: any, event: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return event;
+    });
+    if (!event) {
+        return { msg: "Error: No event with that id" };
+    }
+    const user = await User.findById(userId, (err: any, user: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return user;
+    });
+    if (!user) {
+        return { msg: "Error: No user with that id" };
+    }
+    if (user.registeredEvents.filter(e => e === eventId).length === 0) {
+        return { msg: "Error: User not signed up for event" };
+    }
+    const updateUser = await User.findByIdAndUpdate(userId, { ...user, registerForEvent: user.registeredEvents.filter(e => e !== eventId) }, (err: any) => {
+        if (err) {
+            logger.error(err);
+            return false;
+        }
+        return true;
+    });
+    if (!updateUser) {
+        return { msg: "Error: Can't update user" };
+    }
+    return await Event.findByIdAndUpdate(eventId, { ...event, attendees: event.attendees.filter(e => e.userId !== userId) }, (err: any) => {
+        if (err) {
+            logger.error(err);
+            return { msg: "Error: Can't update event" };
+        }
+        return { msg: "Success: unregisted from event" };
+    });
 }

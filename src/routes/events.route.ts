@@ -11,6 +11,7 @@ class events {
       next(error);
     }
   };
+
   public createEvent = async (
     req: Request,
     res: Response,
@@ -21,6 +22,7 @@ class events {
       next(error);
     }
   };
+
   public getEvent = async (
     req: Request,
     res: Response,
@@ -31,6 +33,7 @@ class events {
       next(error);
     }
   };
+
   public updateEvent = async (
     req: Request,
     res: Response,
@@ -41,6 +44,7 @@ class events {
       next(error);
     }
   };
+
   public deleteEvent = async (
     req: Request,
     res: Response,
@@ -51,6 +55,7 @@ class events {
       next(error);
     }
   };
+
   public registerForEvent = async (
     req: Request,
     res: Response,
@@ -61,6 +66,7 @@ class events {
       next(error);
     }
   };
+
   public removeRegistration = async (
     req: Request,
     res: Response,
@@ -71,6 +77,7 @@ class events {
       next(error);
     }
   };
+
 }
 
 export default new events();
