@@ -1,17 +1,45 @@
 import { Request, Response } from "express";
-import { getUser, getEventsFromUser, insertUser, updateUser, deleteUser } from "../database/queries";
+import { login, getUser, getEventsFromUser, insertUser, updateUser, deleteUser } from "../database/queries";
 import { IUserInterface } from "../database/models/User";
 import jwt = require("jsonwebtoken");
 import config = require('config');
 
 class user {
+  public login = async (
+    req: Request,
+    res: Response,
+    next: (error?: any) => void
+  ) => {
+    try {
+      const result = await login(req.body.email, req.body.password);
+      if (result.hasOwnProperty("msg")) {
+        return res.status(400).json(result);
+      }
+      jwt.sign(
+        {
+          user: result
+        },
+        config.get('jwtSecret'),
+        {
+          expiresIn: 360000
+        },
+        (err: any, token: any) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public getUser = async (
     req: Request,
     res: Response,
     next: (error?: any) => void
   ) => {
     try {
-      const result = await getUser(req.body.email, req.body.password);
+      const result = await getUser(req.params.id);
       if (result.hasOwnProperty("msg")) {
         return res.status(400).json(result);
       }

@@ -45,13 +45,18 @@ class App {
     });
     //Main Router Call to Handle all Requests except Authentication
     this.app.map({
+      "/login": {
+        post: user.login
+      },
       "/user": {
-        get: user.getUser,
         post: user.createUser,
         put: user.updateUser,
         delete: user.deleteUser,
         "/hosted": {
           get: user.getEvents
+        },
+        "/:id": {
+          get: user.getUser,
         }
       },
       "/events": {

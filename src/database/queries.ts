@@ -5,7 +5,7 @@ import { hashEncrypt, compare } from "../util/password.util";
 const logger = new loggerUtil("server");
 
 //Users
-export const getUser = async (email: string, password: string) => {
+export const login = async (email: string, password: string) => {
     const user = await User.findOne({ email }, (err: any, user: any) => {
         if (err) {
             logger.error(err);
@@ -14,12 +14,26 @@ export const getUser = async (email: string, password: string) => {
         return user;
     });
     if (!user) {
-        return { msg: "Error: No user with that email" };
+        return { msg: "Error: incorrect credentials" };
     } else {
         const isMatch = await compare(password, user.password);
         if (!isMatch) {
-            return { msg: "Error: No user with that email" };
+            return { msg: "Error: incorrect credentials" };
         }
+    }
+    return user._id;
+}
+
+export const getUser = async (id: string) => {
+    const user = await User.findById(id, (err: any, user: any) => {
+        if (err) {
+            logger.error(err);
+            return null;
+        }
+        return user;
+    });
+    if (!user) {
+        return { msg: "Error: No user with that email" };
     }
     return user;
 }

@@ -78,7 +78,7 @@ class events {
     next: (error?: any) => void
   ) => {
     try {
-      const result = await getEvent(req.body.id);
+      const result = await getEvent(req.params.id);
       if (!result) {
         return res.status(400).json({ msg: "Error: can't get event" });
       }
@@ -118,7 +118,7 @@ class events {
           endTime: req.body.endTime
         }
       };
-      const result = await updateEvent(req.body.id, eventInt);
+      const result = await updateEvent(req.params.id, eventInt);
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't update event" });
       }
@@ -145,7 +145,7 @@ class events {
     next: (error?: any) => void
   ) => {
     try {
-      const result = await deleteEvent(req.body.id);
+      const result = await deleteEvent(req.params.id);
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't delete event" });
       }
@@ -172,7 +172,7 @@ class events {
     next: (error?: any) => void
   ) => {
     try {
-      const result = await registerForEvent(req.body.eventId, req.body.userId);
+      const result = await registerForEvent(req.params.id, req.body.userId);
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't register for event" });
       }
@@ -198,7 +198,7 @@ class events {
     next: (error?: any) => void
   ) => {
     try {
-      const result = await removeRegistration(req.body.eventId, req.body.userId);
+      const result = await removeRegistration(req.params.id, req.body.userId);
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't remove registration from event" });
       }
