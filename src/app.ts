@@ -24,6 +24,7 @@ class App {
         }
       }
     };
+
     // allow CORs requests
     this.app.use((req: Request, res: Response, next: () => void) => {
       res.header("Access-Control-Allow-Origin", "*");
