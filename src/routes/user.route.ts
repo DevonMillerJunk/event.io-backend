@@ -44,7 +44,7 @@ class user {
         return res.status(400).json(result);
       }
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify(result)),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -69,14 +69,14 @@ class user {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        registeredEvents: req.body.registeredEvents || null
+        registeredEvents: req.body.registeredEvents || []
       };
       const result = await insertUser(userInt);
       if (result.hasOwnProperty("msg")) {
         return res.status(400).json(result);
       }
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify(result)),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -101,7 +101,7 @@ class user {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        registeredEvents: req.body.registeredEvents || null
+        registeredEvents: req.body.registeredEvents || []
       };
       const result = await updateUser(req.body.id, userInt);
       if (!result || result.hasOwnProperty("msg")) {
@@ -155,12 +155,12 @@ class user {
     next: (error?: any) => void
   ) => {
     try {
-      const result = await getEventsFromUser(req.body.id);
+      const result = await getEventsFromUser(req.params.id);
       if (!result) {
         return res.status(400).json({ msg: "Error: Unable to get events of user" });
       }
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify({ events: result })),
         config.get('jwtSecret'),
         {
           expiresIn: 360000

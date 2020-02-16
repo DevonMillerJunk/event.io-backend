@@ -26,16 +26,16 @@ class App {
     };
 
     // allow CORs requests
-    this.app.use((req: Request, res: Response, next: () => void) => {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept, Authorization, Token, Ocp-Apim-Trace "
-      );
-      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-      next();
-    });
-    // parse application/x-www-form-urlencoded
+    // this.app.use((req: Request, res: Response, next: () => void) => {
+    //   res.header("Access-Control-Allow-Origin", "*");
+    //   res.header(
+    //     "Access-Control-Allow-Headers",
+    //     "Origin, X-Requested-With, Content-Type, Accept, Authorization, Token, Ocp-Apim-Trace "
+    //   );
+    //   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    //   next();
+    // });
+    // // parse application/x-www-form-urlencoded
     this.app.use(bodyParser.urlencoded({ extended: false }));
     // parse application/json
     this.app.use(bodyParser.json());
@@ -52,11 +52,11 @@ class App {
         post: user.createUser,
         put: user.updateUser,
         delete: user.deleteUser,
-        "/hosted": {
-          get: user.getEvents
-        },
         "/:id": {
           get: user.getUser,
+          "/hosted": {
+            get: user.getEvents
+          }
         }
       },
       "/events": {

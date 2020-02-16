@@ -17,7 +17,7 @@ class events {
         return res.status(400).json({ msg: "Error: can't get events" });
       }
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify({ events: result })),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -57,7 +57,7 @@ class events {
       }
       await Radar.createGeofence(result._id, req.body.description, req.body.long, req.body.lat);
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify(result)),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -82,9 +82,11 @@ class events {
       if (!result) {
         return res.status(400).json({ msg: "Error: can't get event" });
       }
+      console.log(JSON.stringify(result));
       const users = await Radar.getUsersInGeofence(result._id);
+      console.log(JSON.stringify(users));
       jwt.sign(
-        { ...result, inGeofence: users },
+        JSON.parse(JSON.stringify({ ...result, inGeofence: users })),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -122,9 +124,9 @@ class events {
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't update event" });
       }
-      await Radar.updateGeofence(req.body.id, eventInt.description, eventInt.location ? eventInt.location.long : 0, eventInt.location ? eventInt.location.lat : 0)
+      await Radar.updateGeofence(req.params.id, eventInt.title, eventInt.location ? eventInt.location.long : 0, eventInt.location ? eventInt.location.lat : 0);
       jwt.sign(
-        result,
+        JSON.parse(JSON.stringify(result)),
         config.get('jwtSecret'),
         {
           expiresIn: 360000
@@ -149,7 +151,7 @@ class events {
       if (!result || result.hasOwnProperty("msg")) {
         return res.status(400).json(result || { msg: "Error: can't delete event" });
       }
-      await Radar.deleteGeofence(req.body.id);
+      await Radar.deleteGeofence(req.params.id);
       jwt.sign(
         { msg: result },
         config.get('jwtSecret'),

@@ -60,7 +60,8 @@ export const updateUser = async (id: string, body: IUserInterface) => {
         return { msg: "Error: No user with that id" };
     }
     const encryptedPassword = await hashEncrypt(body.password);
-    return await User.findByIdAndUpdate(id, { ...user, ...body, password: encryptedPassword }, (err: any) => {
+    const newBody = { ...JSON.parse(JSON.stringify(user)), ...body };
+    return await User.findByIdAndUpdate(id, { ...newBody, password: encryptedPassword }, (err: any) => {
         if (err) {
             logger.error(err);
             return { msg: "Error: unable to update user" };
@@ -131,7 +132,7 @@ export const updateEvent = async (id: string, body: IEventInterface) => {
     if (!event) {
         return { msg: "Error: No event with that id" };
     }
-    return await Event.findByIdAndUpdate(id, { ...event, ...body }, (err: any, event: any) => {
+    return await Event.findByIdAndUpdate(id, { ...JSON.parse(JSON.stringify(event)), ...body }, (err: any, event: any) => {
         if (err) {
             logger.error(err);
             return { msg: "Error: can't update event" };
@@ -169,7 +170,7 @@ export const registerForEvent = async (eventId: string, userId: string) => {
     if (user.registeredEvents.filter(e => e === eventId).length >= 1) {
         return { msg: "Error: User already signed up for event" };
     }
-    const updateUser = await User.findByIdAndUpdate(userId, { ...user, registerForEvent: [...user.registeredEvents, eventId] }, (err: any) => {
+    const updateUser = await User.findByIdAndUpdate(userId, { ...JSON.parse(JSON.stringify(user)), registeredEvents: [...JSON.parse(JSON.stringify(user.registeredEvents)), eventId] }, (err: any) => {
         if (err) {
             logger.error(err);
             return false;
@@ -182,7 +183,7 @@ export const registerForEvent = async (eventId: string, userId: string) => {
     const attendee: attendee = {
         userId
     }
-    return await Event.findByIdAndUpdate(eventId, { ...event, attendees: [...event.attendees, attendee] }, (err: any) => {
+    return await Event.findByIdAndUpdate(eventId, { ...JSON.parse(JSON.stringify(event)), attendees: [...JSON.parse(JSON.stringify(event.attendees)), attendee] }, (err: any) => {
         if (err) {
             logger.error(err);
             return { msg: "Error: Can't update event" };
@@ -215,7 +216,7 @@ export const removeRegistration = async (eventId: string, userId: string) => {
     if (user.registeredEvents.filter(e => e === eventId).length === 0) {
         return { msg: "Error: User not signed up for event" };
     }
-    const updateUser = await User.findByIdAndUpdate(userId, { ...user, registerForEvent: user.registeredEvents.filter(e => e !== eventId) }, (err: any) => {
+    const updateUser = await User.findByIdAndUpdate(userId, { ...JSON.parse(JSON.stringify(user)), registeredEvents: JSON.parse(JSON.stringify(user.registeredEvents)).filter((e: any) => e !== eventId) }, (err: any) => {
         if (err) {
             logger.error(err);
             return false;
@@ -225,7 +226,7 @@ export const removeRegistration = async (eventId: string, userId: string) => {
     if (!updateUser) {
         return { msg: "Error: Can't update user" };
     }
-    return await Event.findByIdAndUpdate(eventId, { ...event, attendees: event.attendees.filter(e => e.userId !== userId) }, (err: any) => {
+    return await Event.findByIdAndUpdate(eventId, { ...JSON.parse(JSON.stringify(event)), attendees: JSON.parse(JSON.stringify(event.attendees)).filter((e: any) => e.userId !== userId) }, (err: any) => {
         if (err) {
             logger.error(err);
             return { msg: "Error: Can't update event" };
