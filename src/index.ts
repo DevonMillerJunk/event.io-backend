@@ -4,7 +4,6 @@ import app from "./app";
 import loggerUtil from "./util/logger.util";
 import { connectDB } from "./database/index";
 
-
 const server = new app();
 const logger = new loggerUtil("server");
 try {

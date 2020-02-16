@@ -10,12 +10,12 @@ export interface IEventInterface {
     title: string,
     description: string,
     ownerId: string,
-    attendees: attendee[],
-    timeline: {
+    attendees?: attendee[],
+    timeline?: {
         startTime: string,
         endTime: string
     },
-    location: {
+    location?: {
         lat: number,
         long: number
     }
@@ -25,12 +25,12 @@ export interface IEvent extends mongoose.Document {
     title: string,
     description: string,
     ownerId: string,
-    attendees?: attendee[],
-    timeline?: {
+    attendees: attendee[],
+    timeline: {
         startTime: string,
         endTime: string
     },
-    location?: {
+    location: {
         lat: number,
         long: number
     }

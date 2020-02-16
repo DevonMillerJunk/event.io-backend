@@ -77,7 +77,7 @@ export const getEvent = async (id: string) => {
 }
 
 export const deleteEvent = async (id: string) => {
-    return await User.findByIdAndDelete(id, (err: any) => {
+    return await Event.findByIdAndDelete(id, (err: any) => {
         if (err) {
             logger.error(err);
             return false;
@@ -87,7 +87,7 @@ export const deleteEvent = async (id: string) => {
 }
 
 export const updateEvent = async (id: string, body: IEventInterface) => {
-    return await User.findByIdAndUpdate(id, body, (err: any) => {
+    return await Event.findByIdAndUpdate(id, body, (err: any) => {
         if (err) {
             logger.error(err);
             return false;
@@ -97,6 +97,6 @@ export const updateEvent = async (id: string, body: IEventInterface) => {
 }
 
 export const insertEvent = async (body: IEventInterface) => {
-    const newUser = new User(body);
-    return await newUser.save();
+    const newEvent = new Event(body);
+    return await newEvent.save();
 }
