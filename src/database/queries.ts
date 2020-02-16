@@ -28,9 +28,9 @@ export const deleteUser = async (email: string) => {
     return await User.deleteOne({ email }, (err: any) => {
         if (err) {
             logger.error(err);
-            return false;
+            return { msg: "Error: unable to delete user" };
         }
-        return true;
+        return "Success: user deleted";
     });
 }
 
@@ -49,7 +49,7 @@ export const updateUser = async (id: string, body: IUserInterface) => {
     return await User.findByIdAndUpdate(id, { ...user, ...body, password: encryptedPassword }, (err: any) => {
         if (err) {
             logger.error(err);
-            return "Failure";
+            return { msg: "Error: unable to update user" };
         }
         return "Success";
     });
@@ -58,7 +58,7 @@ export const updateUser = async (id: string, body: IUserInterface) => {
 export const insertUser = async (body: IUserInterface) => {
     const replicate = await User.findOne({ email: body.email });
     if (replicate) {
-        return "Error: Email already in use";
+        return { msg: "Error: Email already in use" };
     }
     const encryptedPassword = await hashEncrypt(body.password);
     const newUser = new User({ ...body, password: encryptedPassword });
@@ -100,9 +100,9 @@ export const deleteEvent = async (id: string) => {
     return await Event.findByIdAndDelete(id, (err: any) => {
         if (err) {
             logger.error(err);
-            return false;
+            return { msg: "Error: unable to delete event" };
         }
-        return true;
+        return "Success: successfully deleted event";
     });
 }
 
@@ -117,12 +117,12 @@ export const updateEvent = async (id: string, body: IEventInterface) => {
     if (!event) {
         return { msg: "Error: No event with that id" };
     }
-    return await Event.findByIdAndUpdate(id, { ...event, ...body }, (err: any) => {
+    return await Event.findByIdAndUpdate(id, { ...event, ...body }, (err: any, event: any) => {
         if (err) {
             logger.error(err);
-            return false;
+            return { msg: "Error: can't update event" };
         }
-        return true;
+        return event;
     });
 }
 
@@ -173,10 +173,9 @@ export const registerForEvent = async (eventId: string, userId: string) => {
             logger.error(err);
             return { msg: "Error: Can't update event" };
         }
-        return { msg: "Success: registered for event" };
+        return "Success: registered for event";
     });
 }
-
 
 export const removeRegistration = async (eventId: string, userId: string) => {
     const event = await Event.findById(eventId, (err: any, event: any) => {
@@ -217,6 +216,6 @@ export const removeRegistration = async (eventId: string, userId: string) => {
             logger.error(err);
             return { msg: "Error: Can't update event" };
         }
-        return { msg: "Success: unregisted from event" };
+        return "Success: unregisted from event";
     });
 }

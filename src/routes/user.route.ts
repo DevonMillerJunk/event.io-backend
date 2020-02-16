@@ -44,7 +44,20 @@ class user {
         registeredEvents: req.body.registeredEvents || null
       };
       const result = await insertUser(userInt);
-      res.send(result);
+      if (result.hasOwnProperty("msg")) {
+        return res.status(400).json(result);
+      }
+      jwt.sign(
+        result,
+        config.get('jwtSecret'),
+        {
+          expiresIn: 360000
+        },
+        (err: any, token: any) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (error) {
       next(error);
     }
@@ -63,6 +76,9 @@ class user {
         registeredEvents: req.body.registeredEvents || null
       };
       const result = await updateUser(req.body.id, userInt);
+      if (!result || result.hasOwnProperty("msg")) {
+        return res.status(400).json(result || { msg: "Error: Unable to update user" });
+      }
       jwt.sign(
         { msg: result },
         config.get('jwtSecret'),
@@ -86,7 +102,20 @@ class user {
   ) => {
     try {
       const result = await deleteUser(req.body.email);
-      res.send(result);
+      if (result.hasOwnProperty("msg")) {
+        return res.status(400).json(result);
+      }
+      jwt.sign(
+        { msg: result },
+        config.get('jwtSecret'),
+        {
+          expiresIn: 360000
+        },
+        (err: any, token: any) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (error) {
       next(error);
     }
@@ -99,6 +128,20 @@ class user {
   ) => {
     try {
       const result = await getEventsFromUser(req.body.id);
+      if (!result) {
+        return res.status(400).json({ msg: "Error: Unable to get events of user" });
+      }
+      jwt.sign(
+        result,
+        config.get('jwtSecret'),
+        {
+          expiresIn: 360000
+        },
+        (err: any, token: any) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (error) {
       next(error);
     }
