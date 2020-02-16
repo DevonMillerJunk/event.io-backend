@@ -45,6 +45,10 @@ class events {
         location: {
           lat: req.body.lat,
           long: req.body.long
+        },
+        timeline: {
+          startTime: req.body.startTime,
+          endTime: req.body.endTime
         }
       };
       const result = await insertEvent(eventInt);
@@ -108,6 +112,10 @@ class events {
         location: {
           lat: req.body.lat,
           long: req.body.long
+        },
+        timeline: {
+          startTime: req.body.startTime,
+          endTime: req.body.endTime
         }
       };
       const result = await updateEvent(req.body.id, eventInt);
